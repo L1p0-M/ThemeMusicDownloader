@@ -10,7 +10,7 @@ try:
 except IndexError as e:
     print("Adja meg a filmek helyét!")
     raise e
-print(os.environ["TOKEN"])
+
 if "TOKEN" not in os.environ:
     try:
         api_key = sys.argv[2]
@@ -18,6 +18,7 @@ if "TOKEN" not in os.environ:
         print("Adjon meg egy TMDB api kulcsot!")
         raise e
 else:
+    print(os.environ["TOKEN"])
     api_key = os.environ["TOKEN"]
 
 TMDB_API_KEY = api_key
@@ -78,25 +79,31 @@ def downloadtheme(theme_url, location, name):
         except:
             print("nem sikerült letölteni :(")
 
+def get_clean_name(dirname):
+    title_split = dirname.split()
+    del title_split[-1]
+    print(title_split)
+    title_clean = ' '.join(title_split)
+    print(title_clean)
+    return title_clean
+
 def main():
     dir = get_titles(location)
     for t in dir:
         print(t)
         if not "theme.mp3" in os.listdir(f"{location}/{t}"):
             print("Témazene Keresése...")
-            title_split = t.split()
-            del title_split[-1]
-            print(title_split)
-            title_clean = ' '.join(title_split)
-            print(title_clean)
+            title_clean = get_clean_name(t)
             tmdb_id = get_tmdb_id(title_clean)
             if tmdb_id:
                 theme_url = get_themerrdb_theme(tmdb_id)
                 if theme_url:
                     downloadtheme(theme_url, location, t)
-                   
                 else:
                     print("Nem volt találat az adatbázisban!")
+                    notfound=[]
+                    notfound.append(t)
+                    print(notfound)
                     inputlink = input(f"Adjon meg egy youtube linket a {title_clean} zenéjéhez:")
                     if inputlink:
                         downloadtheme(inputlink, location, t)
