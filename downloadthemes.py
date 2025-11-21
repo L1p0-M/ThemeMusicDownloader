@@ -56,6 +56,24 @@ def get_themerrdb_theme(tmdb_id):
         print(f"Témazene link: {youtube_link}")
         return youtube_link
 
+def downloadtheme(theme_url, location, name):
+    print(f"Témazene letöltése: {theme_url}")
+    cmd = f"yt-dlp -x --audio-format mp3 -o {location}/'{name}'/theme.mp3 {theme_url}"
+    print(cmd)
+    ydl_opts = {
+        'format': 'mp3/bestaudio/best',
+        'outtmpl': f'{location}/{name}/theme.%(ext)s',
+        'postprocessors': [{  # Extract audio using ffmpeg
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        }]
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        try:
+            error_code = ydl.download(theme_url)
+        except:
+            print("nem sikerült letölteni :(")
 
 def main():
     dir = get_titles(location)
@@ -72,24 +90,8 @@ def main():
             if tmdb_id:
                 theme_url = get_themerrdb_theme(tmdb_id)
                 if theme_url:
-                    print(f"Témazene letöltése: {theme_url}")
-                    cmd = f"yt-dlp -x --audio-format mp3 -o {location}/'{t}'/theme.mp3 {theme_url}"
-                    print(cmd)
-                    #subprocess.call(cmd, shell=True)
-                    ydl_opts = {
-                        'format': 'mp3/bestaudio/best',
-                        'outtmpl': f'{location}/{t}/theme.%(ext)s',
-                        'postprocessors': [{  # Extract audio using ffmpeg
-                        'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
-                        }]
-                    }
-
-                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        try:
-                            error_code = ydl.download(theme_url)
-                        except:
-                            print("nem sikerült letölteni :(")
+                    downloadtheme(theme_url, location, t)
+                   
                 else:
                     print("Nem volt találat az adatbázisban!")
             else:
