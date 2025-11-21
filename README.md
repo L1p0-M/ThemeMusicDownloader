@@ -10,5 +10,6 @@ services:
     environment:
       - TOKEN=*tmdbtoken*
     volumes:
-      - /home/user/movies:/movies
+      - /mnt/hdd1/movies:/movies/hdd1
+      - /mnt/hdd2/movies:/movies/hdd2
 ```

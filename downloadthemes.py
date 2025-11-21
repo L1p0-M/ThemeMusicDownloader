@@ -6,7 +6,7 @@ import yt_dlp
 
 try:
     print("arg1= ", sys.argv[1])
-    location = sys.argv[1]
+    maindir = sys.argv[1]
 except IndexError as e:
     print("Adja meg a filmek helyét!")
     raise e
@@ -22,6 +22,11 @@ else:
     api_key = os.environ["TOKEN"]
 
 TMDB_API_KEY = api_key
+
+def check_folders(maindir):
+    hdds = os.listdir(maindir)
+    return hdds
+
 
 def get_titles(location):
     dirs = os.listdir(location)
@@ -86,33 +91,36 @@ def get_clean_name(dirname):
     title_clean = ' '.join(title_split)
     print(title_clean)
     return title_clean
-
+    
 def main():
-    dir = get_titles(location)
-    for t in dir:
-        print(t)
-        if not "theme.mp3" in os.listdir(f"{location}/{t}"):
-            print("Témazene Keresése...")
-            title_clean = get_clean_name(t)
-            tmdb_id = get_tmdb_id(title_clean)
-            if tmdb_id:
-                theme_url = get_themerrdb_theme(tmdb_id)
-                if theme_url:
-                    downloadtheme(theme_url, location, t)
+    hdds = check_folders(maindir)
+    for h in hdds:
+        location = f"{maindir}/{h}"
+        dir = get_titles(location)
+        for t in dir:
+            print(t)
+            if not "theme.mp3" in os.listdir(f"{location}/{t}"):
+                print("Témazene Keresése...")
+                title_clean = get_clean_name(t)
+                tmdb_id = get_tmdb_id(title_clean)
+                if tmdb_id:
+                    theme_url = get_themerrdb_theme(tmdb_id)
+                    if theme_url:
+                        downloadtheme(theme_url, location, t)
+                    else:
+                        print("Nem volt találat az adatbázisban!")
+                        notfound=[]
+                        notfound.append(t)
+                        print(notfound)
+                        inputlink = input(f"Adjon meg egy youtube linket a {title_clean} zenéjéhez:")
+                        if inputlink:
+                            downloadtheme(inputlink, location, t)
+                        else:
+                            print(f"A {title_clean} zenéje nem lesz letöltve")
                 else:
                     print("Nem volt találat az adatbázisban!")
-                    notfound=[]
-                    notfound.append(t)
-                    print(notfound)
-                    inputlink = input(f"Adjon meg egy youtube linket a {title_clean} zenéjéhez:")
-                    if inputlink:
-                        downloadtheme(inputlink, location, t)
-                    else:
-                        print(f"A {title_clean} zenéje nem lesz letöltve")
             else:
-                print("Nem volt találat az adatbázisban!")
-        else:
-            print(f"A témazene már elérhető a {t}-hez")
-
+                print(f"A témazene már elérhető a {t}-hez")
+    
 if __name__ == "__main__":
     main()
