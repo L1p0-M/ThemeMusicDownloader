@@ -2,7 +2,6 @@ import requests
 import json
 import os
 import sys, getopt
-import subprocess
 import yt_dlp
 
 try:
@@ -11,11 +10,15 @@ try:
 except IndexError as e:
     print("Adja meg a filmek helyét!")
     raise e
-try:
-    api_key = sys.argv[2]
-except IndexError as e:
-    print("Adjon meg egy TMDB api kulcsot!")
-    raise e
+print(os.environ["TOKEN"])
+if "TOKEN" not in os.environ:
+    try:
+        api_key = sys.argv[2]
+    except IndexError as e:
+        print("Adjon meg egy TMDB api kulcsot!")
+        raise e
+else:
+    api_key = os.environ["TOKEN"]
 
 TMDB_API_KEY = api_key
 
