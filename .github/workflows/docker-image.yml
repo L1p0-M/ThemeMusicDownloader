@@ -29,5 +29,5 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          ghcr.io/L1p0-M/thememusicdownloader:latest
-          ghcr.io/L1p0-M/thememusicdownloader:$(date +%s)
+          ghcr.io/l1p0/thememusicdownloader:latest
+          ghcr.io/l1p0/thememusicdownloader:$(date +%s)
