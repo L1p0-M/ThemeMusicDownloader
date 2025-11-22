@@ -30,4 +30,3 @@ jobs:
         push: true
         tags: |
           ghcr.io/l1p0/thememusicdownloader:latest
-          ghcr.io/l1p0/thememusicdownloader:$(date +%s)
