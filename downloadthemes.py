@@ -98,7 +98,6 @@ def main():
         location = f"{maindir}/{h}"
         dir = get_titles(location)
         print(dir)
-
         for t in dir:
             print(t)
             if not "theme.mp3" in os.listdir(f"{location}/{t}"):
@@ -114,11 +113,11 @@ def main():
                         notfound=[]
                         notfound.append(t)
                         print(notfound)
-                        inputlink = input(f"Adjon meg egy youtube linket a {title_clean} zenéjéhez:")
-                        if inputlink:
-                            downloadtheme(inputlink, location, t)
-                        else:
-                            print(f"A {title_clean} zenéje nem lesz letöltve")
+                        #inputlink = input(f"Adjon meg egy youtube linket a {title_clean} zenéjéhez:")
+                        #if inputlink:
+                            #downloadtheme(inputlink, location, t)
+                        #else:
+                            #print(f"A {title_clean} zenéje nem lesz letöltve")
                 else:
                     print("Nem volt találat az adatbázisban!")
             else:
