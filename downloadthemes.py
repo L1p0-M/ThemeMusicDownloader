@@ -98,6 +98,7 @@ def main():
         location = f"{maindir}/{h}"
         dir = get_titles(location)
         print(dir)
+
         for t in dir:
             print(t)
             if not "theme.mp3" in os.listdir(f"{location}/{t}"):
