@@ -83,6 +83,7 @@ def downloadtheme(theme_url, location, name):
             error_code = ydl.download(theme_url)
         except:
             print("nem sikerült letölteni :(")
+            return "fail"
 
 def get_clean_name(dirname):
     title_split = dirname.split()
@@ -135,7 +136,20 @@ def processlink(title):
     except Exception as e:
         print(f"Hiba a fájl olvasásakor: {e}")
         return None
-    
+
+def processnotfounds(t, location):
+    is_in_config = checkconfig(f"{t}:")
+    if is_in_config:
+        link = processlink(f"{t}: ")
+        if link:
+            downloadtheme(link, location, t)
+    else:
+        configsucess = writeconfig(f"{t}:")
+        if configsucess == "sucess":
+            print("A cím hozzáadva a notfound.txt fájlhoz.")
+        else:
+            print("Hiba történt a notfound.txt fájl írásakor.")
+            
 def main():
     hdds = check_folders(maindir)
     for h in hdds:
@@ -151,19 +165,12 @@ def main():
                 if tmdb_id:
                     theme_url = get_themerrdb_theme(tmdb_id)
                     if theme_url:
-                        downloadtheme(theme_url, location, t)
+                        is_sucessfull = downloadtheme(theme_url, location, t)
+                        if is_sucessfull == "fail":
+                            print("Hiba történt a letöltés során.")
+                            processnotfounds(t, location)
                     else:
-                        is_in_config = checkconfig(f"{t}:")
-                        if is_in_config:
-                            link = processlink(f"{t}: ")
-                            if link:
-                                downloadtheme(link, location, t)
-                        else:
-                            configsucess = writeconfig(f"{t}:")
-                            if configsucess == "sucess":
-                                print("A cím hozzáadva a notfound.txt fájlhoz.")
-                            else:
-                                print("Hiba történt a notfound.txt fájl írásakor.")
+                        processnotfounds(t, location)
                         
                 else:
                     print("Nem volt találat az adatbázisban!")
