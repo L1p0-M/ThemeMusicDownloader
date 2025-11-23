@@ -91,6 +91,50 @@ def get_clean_name(dirname):
     title_clean = ' '.join(title_split)
     print(title_clean)
     return title_clean
+
+def writeconfig(title):
+    try:
+        with open('/config/notfound.txt', 'a') as f:
+            f.write(f"{title}\n")
+            return "sucess"
+    except Exception as e:
+        print(f"Hiba a fájl írásakor: {e}")
+        return "fail"
+    
+def checkconfig(title):
+    try:
+        with open('/config/notfound.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if title in line:
+                    print(line)
+                    print("Ez a cím már szerepel a notfound.txt fájlban.")
+                    return True
+                else:
+                    pass
+                if line == lines[-1]:
+                    return False
+    except FileNotFoundError:
+        print("A notfound.txt fájl nem létezik, létrehozás...")
+        with open('/config/notfound.txt', 'w') as f:
+            pass
+    
+def processlink(title):
+    try:
+        with open('/config/notfound.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if title in line:
+                    link = line.replace(f"{title}", "")
+                    print(link)
+                    if link != "":
+                        return link
+                    else:
+                        return None
+                
+    except Exception as e:
+        print(f"Hiba a fájl olvasásakor: {e}")
+        return None
     
 def main():
     hdds = check_folders(maindir)
@@ -109,15 +153,18 @@ def main():
                     if theme_url:
                         downloadtheme(theme_url, location, t)
                     else:
-                        print("Nem volt találat az adatbázisban!")
-                        notfound=[]
-                        notfound.append(t)
-                        print(notfound)
-                        #inputlink = input(f"Adjon meg egy youtube linket a {title_clean} zenéjéhez:")
-                        #if inputlink:
-                            #downloadtheme(inputlink, location, t)
-                        #else:
-                            #print(f"A {title_clean} zenéje nem lesz letöltve")
+                        is_in_config = checkconfig(f"{t}:")
+                        if is_in_config:
+                            link = processlink(f"{t}: ")
+                            if link:
+                                downloadtheme(link, location, t)
+                        else:
+                            configsucess = writeconfig(f"{t}:")
+                            if configsucess == "sucess":
+                                print("A cím hozzáadva a notfound.txt fájlhoz.")
+                            else:
+                                print("Hiba történt a notfound.txt fájl írásakor.")
+                        
                 else:
                     print("Nem volt találat az adatbázisban!")
             else:
