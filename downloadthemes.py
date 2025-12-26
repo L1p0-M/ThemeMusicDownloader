@@ -43,7 +43,6 @@ def get_tmdb_id(title, type):
     params = {"api_key": TMDB_API_KEY, "query": title}
     response = requests.get(url, params=params)
     data = response.json()
-    print(data)
 
     if not data["results"]:
         print("Nincs találat a TMDb-ben erre a címre.")
