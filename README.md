@@ -12,6 +12,7 @@ services:
     volumes:
       - /mnt/hdd1/movies:/movies/hdd1
       - /mnt/hdd2/movies:/movies/hdd2
+      - /mnt/hdd3/series:/series/hdd3
       - /dockerconfig/thememusicdownloader/config:/config
 ```
 

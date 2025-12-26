@@ -7,13 +7,17 @@ import yt_dlp
 try:
     print("arg1= ", sys.argv[1])
     maindir = sys.argv[1]
+    print("arg2= ", sys.argv[2])
+    seriesdir = sys.argv[2]
+    print("arg3= ", sys.argv[3])
+    configdir = sys.argv[3]
 except IndexError as e:
-    print("Adja meg a filmek helyét!")
+    print("Adja meg a filmek/sorozatok helyét!")
     raise e
 
 if "TOKEN" not in os.environ:
     try:
-        api_key = sys.argv[2]
+        api_key = sys.argv[4]
     except IndexError as e:
         print("Adjon meg egy TMDB api kulcsot!")
         raise e
@@ -33,26 +37,27 @@ def get_titles(location):
     print(dirs)
     return dirs
 
-def get_tmdb_id(title):
+def get_tmdb_id(title, type):
     """Lekéri a film TMDb ID-ját a cím alapján."""
-    url = f"https://api.themoviedb.org/3/search/movie"
+    url = f"https://api.themoviedb.org/3/search/{type}"
     params = {"api_key": TMDB_API_KEY, "query": title}
     response = requests.get(url, params=params)
     data = response.json()
+    print(data)
 
     if not data["results"]:
         print("Nincs találat a TMDb-ben erre a címre.")
         return None
 
     movie_id = data["results"][0]["id"]
-    movie_name = data["results"][0]["title"]
-    print(f"🎬 {movie_name} (TMDb ID: {movie_id})")
+    #movie_name = data["results"][0]["title"]
+    print(f"🎬 {title} (TMDb ID: {movie_id})")
     return movie_id
 
 
-def get_themerrdb_theme(tmdb_id):
+def get_themerrdb_theme(tmdb_id, type):
     """Lekéri a ThemerrDB-ből a témazenét YouTube-linkkel."""
-    url = f"https://raw.githubusercontent.com/LizardByte/ThemerrDB/refs/heads/database/movies/themoviedb/{tmdb_id}.json"
+    url = f"https://raw.githubusercontent.com/LizardByte/ThemerrDB/refs/heads/database/{type}/themoviedb/{tmdb_id}.json"
     response = requests.get(url)
 
     if response.status_code != 200:
@@ -95,7 +100,7 @@ def get_clean_name(dirname):
 
 def writeconfig(title):
     try:
-        with open('/config/notfound.txt', 'a') as f:
+        with open(f'{configdir}/notfound.txt', 'a') as f:
             f.write(f"{title}\n")
             return "sucess"
     except Exception as e:
@@ -104,7 +109,7 @@ def writeconfig(title):
     
 def checkconfig(title):
     try:
-        with open('/config/notfound.txt', 'r') as f:
+        with open(f'{configdir}/notfound.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 if title in line:
@@ -117,12 +122,12 @@ def checkconfig(title):
                     return False
     except FileNotFoundError:
         print("A notfound.txt fájl nem létezik, létrehozás...")
-        with open('/config/notfound.txt', 'w') as f:
+        with open(f'{configdir}/notfound.txt', 'w') as f:
             pass
     
 def processlink(title):
     try:
-        with open('/config/notfound.txt', 'r') as f:
+        with open(f'{configdir}/notfound.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 if title in line:
@@ -149,8 +154,35 @@ def processnotfounds(t, location):
             print("A cím hozzáadva a notfound.txt fájlhoz.")
         else:
             print("Hiba történt a notfound.txt fájl írásakor.")
-            
-def main():
+
+def process_series():
+    hdds = check_folders(seriesdir)
+    for h in hdds:
+        location = f"{seriesdir}/{h}"
+        dir = get_titles(location)
+        print(dir)
+        for t in dir:
+            print(t)
+            if not "theme.mp3" in os.listdir(f"{location}/{t}"):
+                print("Témazene Keresése...")
+                title_clean = t
+                tmdb_id = get_tmdb_id(title_clean, "tv")
+                if tmdb_id:
+                    theme_url = get_themerrdb_theme(tmdb_id, "tv_shows")
+                    if theme_url:
+                        is_sucessfull = downloadtheme(theme_url, location, t)
+                        if is_sucessfull == "fail":
+                            print("Hiba történt a letöltés során.")
+                            processnotfounds(t, location)
+                    else:
+                        processnotfounds(t, location)
+                        
+                else:
+                    print("Nem volt találat az adatbázisban!")
+            else:
+                print(f"A témazene már elérhető a {t}-hez")
+
+def process_movies():
     hdds = check_folders(maindir)
     for h in hdds:
         location = f"{maindir}/{h}"
@@ -161,9 +193,9 @@ def main():
             if not "theme.mp3" in os.listdir(f"{location}/{t}"):
                 print("Témazene Keresése...")
                 title_clean = get_clean_name(t)
-                tmdb_id = get_tmdb_id(title_clean)
+                tmdb_id = get_tmdb_id(title_clean, "movie")
                 if tmdb_id:
-                    theme_url = get_themerrdb_theme(tmdb_id)
+                    theme_url = get_themerrdb_theme(tmdb_id, "movies")
                     if theme_url:
                         is_sucessfull = downloadtheme(theme_url, location, t)
                         if is_sucessfull == "fail":
@@ -177,5 +209,9 @@ def main():
             else:
                 print(f"A témazene már elérhető a {t}-hez")
     
+def main():
+    process_movies()
+    process_series()
+
 if __name__ == "__main__":
     main()

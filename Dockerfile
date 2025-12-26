@@ -4,6 +4,7 @@ ADD downloadthemes.py /app
 RUN pip install requests yt_dlp
 RUN apk --no-cache add ffmpeg
 RUN mkdir /movies
+RUN mkdir /series
 RUN mkdir /config
-WORKDIR /movies
-CMD python /app/downloadthemes.py /movies
+CMD python /app/downloadthemes.py /movies /series /config
+
