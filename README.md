@@ -5,7 +5,7 @@ Example docker-compose.yaml:
 ```
 services:
   thememusicdownloader:
-    image: thememusicdownloader:latest
+    image: ghcr.io/l1p0-m/thememusicdownloader:latest
     container_name: ThemeMusicDownloader
     environment:
       - TOKEN=*tmdbtoken*
@@ -25,6 +25,3 @@ One Battle After Another (2025): https://youtu.be/YzhjTeSz9y4?si=M23WZaepQCUt7TN
 ```
 
 Rerun the container,and its gonna download all specified music :)
-
-To do:
-update yt-dlp :/
